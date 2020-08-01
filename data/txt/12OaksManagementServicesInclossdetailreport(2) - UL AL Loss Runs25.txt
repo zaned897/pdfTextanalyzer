@@ -1,0 +1,35 @@
+Page: 26 of 33
+3/2/2018 10:38 AM
+
+Account 8005109 SHP IV Prestonwood, LLC
+6
+Product NH Nursing Home Package
+
+Policy Number PHPK1601926 01/21/2017 TO
+
+Claim Number Claimant/Driver Name
+
+PHNH17051078235 SHP IV Prestonwood, LLC
+PHNH17051078235 B10452
+PHNH17051078235 B10452
+PHNH17051079452 SHP IV Prestonwood, LLC
+
+Total Number of Claims For Policy PHPK1601926
+
+Philadelphia Insurance Companies
+Customer Loss Detail Report
+
+ 
+
+ 
+
+Subro/Sal_
+Status Loss Date Open Closed Loss/Exps Paid Recovered Rep
+COMP - Natural Causes CL 04/24/2017 05/18/2017 10/05/2017 2,440.06 0.00 Mims
+COMP - Natural Causes CL 04/24/2017 05/18/2017 10/05/2017 2,676.27 0.00 Mims
+Comp Natrl Causes Rent Expense CL 04/24/2017 05/18/2017 10/05/2017 712.01 0.00 Mims
+COMP - Natural Causes NP 04/24/2017 05/23/2017 05/24/2017 0.00 0.00 Thicklen
+Total Loss/Exp Paid: 5,828.34
+Salv/Subro Recovered: 0.00
+Total Reserves: 0.00
+Total Incurred: 5,828.34

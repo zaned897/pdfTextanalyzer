@@ -1,0 +1,21 @@
+Page: 12 of 33 Philadelphia Insurance Companies
+3/2/2018 10:38 AM Customer Loss Detail Report
+
+ 
+
+Account 8005109 SHP IV Prestonwood, LLC
+
+ 
+
+6
+Product NH Nursing Home Package
+Policy Number PHPK1283620 01/21/2015 TO 01/21/2016
+Subro/Sal
+Claim Number Claimant/Driver Name Loss Type Status Loss Date Open Closed Loss/Exps Paid Recovered Rep
+Unknown Claimant 0.00 0.00
+Total Number of Claims For Policy ©PHPK1283620 0 Total Loss/Exp Paid: 0.00
+
+Salv/Subro Recovered: 0.00
+Total Reserves: 0.00
+
+Total Incurred: 0.00

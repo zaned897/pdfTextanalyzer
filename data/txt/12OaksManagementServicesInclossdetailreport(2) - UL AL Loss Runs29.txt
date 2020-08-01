@@ -1,0 +1,24 @@
+Page: 30 of 33 Philadelphia Insurance Companies
+3/2/2018 10:38 AM Customer Loss Detail Report
+
+ 
+
+Account 8005109 MTAL Operators, LLC;
+
+ 
+
+6
+Product NH Nursing Home Package
+Policy Number PHPK1764200 01/21/2018 TO 01/21/2019
+
+Subro/Sal
+
+Claim Number Claimant/Driver Name Loss Type Status Loss Date Open Closed Loss/Exps Paid Recovered Rep
+PHNH18021147330 MTAL Operators, LLC; Collision CL 02/01/2018 02/02/2018 02/13/2018 307.78 0.00 Antwine
+PHNH18021 147330 THE FARAH LAW FIRM CL 02/01/2018 02/02/2018 02/13/2018 0.00 0.00 Antwine
+Total Number of Claims For Policy ©PHPK1764200 1 Total Loss/Exp Paid: 307.78
+
+Salv/Subro Recovered: 0.00
+Total Reserves: 0.00
+
+Total Incurred: 307.78

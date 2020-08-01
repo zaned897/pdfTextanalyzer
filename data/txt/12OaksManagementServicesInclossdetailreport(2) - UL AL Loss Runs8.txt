@@ -1,0 +1,28 @@
+Page: 9 of 33
+3/2/2018 10:38 AM
+
+Account 8005109 12 Oaks Management Services, Inc.
+
+6
+Product NH Nursing Home Package
+Policy Number PHPK1213623 08/01/2014 TO 01/21/2015
+Claim Number Claimant/Driver Name Loss Type
+
+PHNH14100848223 12 Oaks Management Services, Inc. COMP - Other
+
+Total Number of Claims For Policy =PHPK1213623 1
+
+Philadelphia Insurance Companies
+Customer Loss Detail Report
+
+ 
+
+ 
+
+Subro/Sal
+Status Loss Date Open Closed Loss/Exps Paid Recovered Rep
+CL 10/23/2014 10/27/2014 11/03/2014 7,563.12 0.00 Stewart
+Total Loss/Exp Paid: 7,563.12
+Salv/Subro Recovered: 0.00
+Total Reserves: 0.00
+Total Incurred: 7,563.12
