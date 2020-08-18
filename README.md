@@ -137,3 +137,6 @@ $ Scripts/deactivate
 ## Methodology
 # Context
 ![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/Flowchart.png)
+
+![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/test.png)
+
