@@ -1,6 +1,6 @@
 insurer= CARRIER, CONSUMER,
 insured= CARRIED, PREPARED FOR, CLAIMANT,
-valued date= LOSSES VALUED AS OF, AS OF,
+valued date= AS OF,
 loss date = DATE OF LOSS, LOSS DATE,
 reported date = DATE REPORTED,
 status = STATUS,
