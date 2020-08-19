@@ -138,5 +138,5 @@ $ Scripts/deactivate
 # Context
 ![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/Flowchart.png)
 
-![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/test.png)
+![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/first_stage_algorithm.png)
 
