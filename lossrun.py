@@ -1,6 +1,7 @@
 import ast # txt format
 import numpy as np # math library
 import copy
+
 def read_dict(txt_file_path):
     ## Read txt file as dict more data available (i.e., position, size and      level info)
     # open file 
