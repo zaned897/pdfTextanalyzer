@@ -1,6 +1,6 @@
 import ast # txt format
 import numpy as np # math library
-
+import copy
 def read_dict(txt_file_path):
     ## Read txt file as dict more data available (i.e., position, size and      level info)
     # open file 
@@ -32,56 +32,70 @@ def map_words(txt_dict):
     return string_result.upper(),pos
 
 
-def search_rules (dictionary, rules):
-
-    _,pos = map_words(dictionary)
-    #radius =  .02 * np.sqrt(np.array(dictionary['top']).max()**2 + np.array(dictionary['left']).max()**2)
+def search_rules(dictionary, rules):
+    
     radius = 300
+    # map words possitions in text list
+    _, poss = map_words(dictionary)
 
-    # convert in string, for search rules pourpuses
-    new_sentences = ' '.join(dictionary['text']).upper()
-    _tuple_rules = []
-    _tuple_cords = []
+    # Deep copy dictionary 
+    _temp_dict = copy.deepcopy(dictionary)
 
-    ## search for data points of interest
-    # iterate througth each data point 
-    for _, item in enumerate(rules):
-        # search every combination of rules
+
+    # convert to uppercase
+    _temp_dict['text']= [_temp_dict['text'][i].upper() for i in range(len(_temp_dict['text']))]
+
+    # create the sentences
+    sentence = ' '.join(_temp_dict['text'])
+
+    # define the list for results 
+    rules_coords = []
+    
+    # iterate trhougth rules
+    for _, item  in enumerate(rules):
+
         for i in range(len(rules[item])):
-            # try to found complete rule
-            try: 
-                _pos = pos.index(new_sentences.index(rules[item][i]))
-                ## !! se tiene que modificar
-                _tuple_rules += [(rules[item][i],_pos)]
-            
-            # try to split the grammar rule
-            except:
-                # search word by word
-                asociate_terms = rules[item][i].split(' ')
-                
-                if asociate_terms[0] in new_sentences:
-                    # get the position
-                    position = pos.index(new_sentences.index(asociate_terms[0]))+1
-                    # get x, and y coords
-                    coord_x = dictionary['left'][position]
-                    coord_y = dictionary['top'][position]
-                    # string for search
-                    _aux = []
-                    # search first match radius (i.e, DATE neighborhood -> date report, date loss, loss date, etc)
-                    for j in range(len(dictionary['text'])):
-                        # calculate the distance in neighborhood
-                        dist_euc = np.sqrt((coord_x-dictionary['left'][j])**2 + (coord_y-dictionary['top'][j])**2)
-                        if dist_euc <= radius:
-                            _aux.append(dictionary['text'][j].upper())                                            
-            
-                    _aux_rules =rules[item][i].split(' ')
-                  #  print(_aux)
-                  #  print(_aux_rules)
-                    if all(elem in _aux for elem in _aux_rules):
-                        _tuple_rules += [(rules[item][i],pos.index(new_sentences.index(asociate_terms[0])))]
 
-                else:
-                    pass
-    for i in range (len(_tuple_rules)):
-        _tuple_cords += [(dictionary['left'][_tuple_rules[i][1]+1], dictionary['top'][_tuple_rules[i][1]+1])]
-    return _tuple_cords
+            # if there is the entire rule in the text
+            if rules[item][i] in sentence:
+
+                # process while rule is in the text
+                while rules[item][i] in sentence: 
+                    # text 
+                        
+                    _temp_dict['text'][poss.index(sentence.index(rules[item][i]))+1] = '?' * len(_temp_dict['text'][poss.index(sentence.index(rules[item][i]))+1])
+                    rules_coords += [(_temp_dict['left'][poss.index(sentence.index(rules[item][i]))+1], _temp_dict['top'][poss.index(sentence.index(rules[item][i]))+1])]
+                    sentence = ' '.join(_temp_dict['text'])
+
+
+            # if there is some part of the rule
+            elif (rules[item][i].split(' ')[0] in sentence):
+                
+                asociate_terms = rules[item][i].split(' ')
+                    
+                while asociate_terms[0] in sentence:
+                    
+                    position = poss.index(sentence.index(asociate_terms[0]))+1
+                    coord_x = _temp_dict['left'][position]
+                    coord_y = _temp_dict['top'][position]
+                    _aux = []
+                    for j in range(len(_temp_dict['text'])):
+                        dist_euc = np.sqrt((coord_x - _temp_dict['left'][j])**2 + (coord_y - _temp_dict['top'][j])**2)
+                       
+                        if dist_euc <= radius:
+                            _aux.append(_temp_dict['text'][j])
+                                    
+                    
+
+                    if all(elem in _aux for elem in asociate_terms):
+                    
+                        _temp_dict['text'][poss.index(sentence.index(asociate_terms[0]))+1] = '}' * len(_temp_dict['text'][poss.index(sentence.index(asociate_terms[0]))+1])
+                        rules_coords  += [(_temp_dict['left'][poss.index(sentence.index(asociate_terms[0]))+1] , _temp_dict['top'][poss.index(sentence.index(asociate_terms[0]))+1])]
+                        sentence = ' '.join(_temp_dict['text'])
+                       
+                    else:
+                        break
+            else:
+                pass
+
+    return rules_coords 

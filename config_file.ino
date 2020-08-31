@@ -1,4 +1,4 @@
-insurer= CARRIER, CONSUMER,
+insurer= CARRIER,CONSUMER
 insured= CARRIED, PREPARED FOR, CLAIMANT,
 valued date= AS OF,
 loss date = DATE OF LOSS, LOSS DATE,
@@ -10,5 +10,5 @@ indemnity reserve= INDEMNITY RESERVE,
 indemnity paid= INDEMNITY PAID,
 report date = RPT DATE, 
 broker = BROKER,
-
+expense payments = EXPENSE PAYMENTS,
 
