@@ -18,6 +18,51 @@ def read_dict(txt_file_path):
     
     return txt_as_dict
 
+## Extract features from dictionary data, as mass center, deviation, text size, claims, and others
+
+# take the list of multiple txt files as input
+def extract_statistic_featrues(list_of_paths_of_txt_files):
+    
+    # get the  number of params to meassure
+    
+    # create empty variables for mean, std, etc according files size 
+    mean_x, mean_y, std_x, std_y, size_x, size_y = [],[],[],[],[],[]
+    #
+    words_number, no_claims, max_levels, level_average = [],[],[],[]
+    
+    # get the number of files to extract 
+    files = len(list_of_paths_of_txt_files)
+    
+    # extract each data
+    for i in range(files):
+
+        # convert the txt data to dict form
+        data_dict = read_dict(list_of_paths_of_txt_files[i])
+
+        # get the mean features. LEFT = x, TOP = y
+        mean_x.append(np.mean(data_dict['left']))
+        mean_y.append(np.mean(data_dict['top']))
+        std_x.append(np.std(data_dict['left']))
+        std_y.append(np.std(data_dict['top']))
+    
+        # get the pdf text size
+        size_x.append(np.max(data_dict['left']) - np.min(data_dict['left']))
+        size_y.append(np.max(data_dict['top']) - np.min(data_dict['top']))
+
+        # get the words numbers 
+        words_number.append(len(data_dict['text']))
+
+        # no claims in report? 
+        no_claims.append(('NO CLAIM' or 'NO LOSS') in ' '.join(data_dict['text']))
+
+        # max of levels
+        max_levels.append(np.max(data_dict['level']))
+
+        # level average
+        level_average.append(np.mean(data_dict['level']))
+
+    return np.array([mean_x] + [mean_y] + [std_x] + [std_y] + [size_x] + [size_y] + [words_number] + [no_claims] + [max_levels] + [level_average])
+
 def map_words(txt_dict):
     elements = len(txt_dict['text'])
     x = np.zeros(shape= (elements,1),dtype = int)
