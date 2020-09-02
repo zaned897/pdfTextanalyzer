@@ -110,7 +110,7 @@ def search_rules(dictionary, rules):
                     # text 
                         
                     _temp_dict['text'][poss.index(sentence.index(rules[item][i]))+1] = '?' * len(_temp_dict['text'][poss.index(sentence.index(rules[item][i]))+1])
-                    rules_coords += [(_temp_dict['left'][poss.index(sentence.index(rules[item][i]))+1], _temp_dict['top'][poss.index(sentence.index(rules[item][i]))+1])]
+                    rules_coords += [(rules[item][i], _temp_dict['left'][poss.index(sentence.index(rules[item][i]))+1], _temp_dict['top'][poss.index(sentence.index(rules[item][i]))+1])]
                     sentence = ' '.join(_temp_dict['text'])
 
 
@@ -136,7 +136,7 @@ def search_rules(dictionary, rules):
                     if all(elem in _aux for elem in asociate_terms):
                     
                         _temp_dict['text'][poss.index(sentence.index(asociate_terms[0]))+1] = '}' * len(_temp_dict['text'][poss.index(sentence.index(asociate_terms[0]))+1])
-                        rules_coords  += [(_temp_dict['left'][poss.index(sentence.index(asociate_terms[0]))+1] , _temp_dict['top'][poss.index(sentence.index(asociate_terms[0]))+1])]
+                        rules_coords  += [(asociate_terms[0], _temp_dict['left'][poss.index(sentence.index(asociate_terms[0]))+1] , _temp_dict['top'][poss.index(sentence.index(asociate_terms[0]))+1])]
                         sentence = ' '.join(_temp_dict['text'])
                        
                     else:
