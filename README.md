@@ -134,6 +134,21 @@ $ pip install -r requirements.txt
 ```sh
 $ Scripts/deactivate
 ```
+
+### Lossrun database models
+Use the Python pip package installer command to install required Python libraries:
+```sh
+$ pip install sqlalchemy
+$ pip install psycopg2
+```
+
+The system must have PostgreSQL service running, to install PostgreSQL on your system follow the next instructions [here](https://www.postgresql.org/download/), then you should change line 7 on script Lossrun_models.py to specify the username, password, and database name used in PostgreSQL. 
+To execute script run
+```sh
+python Lossrun_models.py
+```
+This will create all tables and insert some initial records in tables.
+
 ## Methodology
 # Context
 ![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/Flowchart.png)
