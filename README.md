@@ -151,7 +151,10 @@ This will create all tables and insert some initial records in tables.
 
 ## Methodology
 # Context
+
 ![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/Flowchart.png)
 
 ![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/first_stage_algorithm.png)
 
+#  Stage 2
+![flowchart](https://github.com/zaned897/pdfTextanalyzer/blob/master/data/results/Stage_2.png)
