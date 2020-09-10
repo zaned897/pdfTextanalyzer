@@ -1,6 +1,63 @@
 import ast # txt format
 import numpy as np # math library
 import copy
+import cv2
+import os
+from configobj import ConfigObj
+import random
+
+
+def pre_proc(pdf_file, data_path, topic_file):
+
+    ## Read raw txt info in pdf report
+    PATH_txt = os.path.join('.',data_path,'txt','')
+    PATH_image = os.path.join('.',data_path,'images','')
+
+    #  Read text file 
+    txt_file = PATH_txt + pdf_file + '.txt'
+    #image file
+    image_file = PATH_image + pdf_file + '.jpg'
+
+    # Read as dict format txt file
+    txt_dict = read_dict(txt_file)
+
+    # Load topics
+    template_rules = ConfigObj(topic_file)
+
+    # Search topic in text raw dict
+    j = search_rules(txt_dict,template_rules)
+
+    # Read image 
+    _image_c = cv2.imread(image_file) 
+    _image = cv2.imread(image_file) 
+
+
+    for i in range(len(j)):
+    
+    # get the box dimentions
+        (l, t, w, h) = (txt_dict['left'][j[i][2]],
+                    txt_dict['top'][j[i][2]],
+                    txt_dict['width'][j[i][2]],
+                    txt_dict['height'][j[i][2]]
+                    )
+
+
+        # define random colors for each target
+        #r = random.randint(0,255)
+        #g = random.randint(0,255)
+        #b = random.randint(0,255)
+        r = 0
+        g = 0
+        b = 255
+        
+        
+        #Create a circle for each target
+        cv2.circle(_image_c, ( l+ np.uint8(w/2), t + np.uint8(h/2)),8,(r,g,b),-1)
+    # 
+
+    
+    return txt_dict, _image_c, _image, j
+    
 
 def read_dict(txt_file_path):
     ## Read txt file as dict more data available (i.e., position, size and      level info)
