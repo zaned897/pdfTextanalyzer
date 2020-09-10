@@ -5,7 +5,57 @@ import cv2
 import os
 from configobj import ConfigObj
 import random
+from tensorflow.keras.utils import get_file
+import gensim
+import spacy
+from spacy import displacy
+# load entity model
 
+
+
+
+def load_context_model():
+    path = '/home/zned897/.keras/datasets/GoogleNews-vectors-negative300.bin.gz'
+    model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=True)
+    return model
+
+
+#def ner_filter(topic, rules_config):
+#    nlp = spacy.load('en')
+#    ner_rules = ConfigObj(rules_config)
+
+#    for i in range(len())
+ 
+
+def spatial_filter(txt_dict, topics):
+
+    all_candidates = []
+
+    for i in range(len(topics)):
+        (l, t, w, h) = (txt_dict['left'][topics[i][2]],
+                    txt_dict['top'][topics[i][2]],
+                    txt_dict['width'][topics[i][2]],
+                    txt_dict['height'][topics[i][2]]
+                    )
+
+        vertical_candidates = []
+        horizontal_candidates = []
+        
+
+        for i in range(len(txt_dict['text'])):
+            
+            # if text is in same column
+            if (txt_dict['left'][i] > l - w and txt_dict['left'][i] < l + w and txt_dict['top'][i] > t):
+                vertical_candidates.append(txt_dict['text'][i])
+
+            # if text is in same row
+            if (txt_dict['top'][i] > t - h and txt_dict['top'][i] < t + h and txt_dict['left'][i] > l):
+                horizontal_candidates.append(txt_dict['text'][i])
+
+        # join all candidates            
+        all_candidates +=  [vertical_candidates + horizontal_candidates]
+
+    return all_candidates
 
 def pre_proc(pdf_file, data_path, topic_file):
 
