@@ -230,7 +230,6 @@ def search_rules(dictionary, rules):
                 asociate_terms = rules[item][i].split(' ')
                     
                 while asociate_terms[0] in sentence:
-                    
                     position = poss.index(sentence.index(asociate_terms[0]))+1
                     coord_x = _temp_dict['left'][position]
                     coord_y = _temp_dict['top'][position]
