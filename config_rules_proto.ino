@@ -1,5 +1,0 @@
-insurer = ORG,
-insured = PERSON, ORG,
-valued date= DATE,
-loss date = DATE,
-policy = CARDINAL, 

@@ -187,7 +187,10 @@ def map_words(txt_dict):
 
 def search_rules(dictionary, rules):
     
-    radius = 100
+    
+    # most be modified
+    radius = 200
+
     # map words possitions in text list
     _, poss = map_words(dictionary)
 

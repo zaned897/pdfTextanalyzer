@@ -1,5 +1,0 @@
-insurer = CARRIER,CONSUMER,
-insured = CARRIED, PREPARED FOR, CLAIMANT,
-valued date= AS OF,
-loss date = DATE OF LOSS, LOSS DATE,
-policy = POLICY NUM, 
