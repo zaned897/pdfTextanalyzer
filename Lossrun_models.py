@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, Numeric, DateTime, ForeignKey
 import datetime
 
-engine = create_engine('postgresql://postgresql_user:postgresql_password@localhost/db_name', echo=True)
+engine = create_engine('postgresql://postgres:toor@localhost/lossrun', echo=True)
 Session = sessionmaker(bind=engine)()
 Base = declarative_base()
 
@@ -26,7 +26,6 @@ class StatusDim(Base):
 
     status_id = Column(Integer, primary_key = True)
     status_name = Column(String)
-    lossrun_facts = relationship("LossRunFact")
 
     def __init__(self, status_name):
         self.status_name = status_name
@@ -38,7 +37,6 @@ class InsurerDim(Base):
     insurer_name = Column(String)
     insurer_address = Column(String)
     insurer_status = Column(String)
-    lossrun_facts = relationship("LossRunFact")
 
     def __init__(self, insurer_name, insurer_address, insurer_status):
         self.insurer_name = insurer_name
@@ -52,7 +50,6 @@ class InsuredDim(Base):
     insured_name = Column(String)
     insured_address = Column(String)
     insured_status = Column(String)
-    lossrun_facts = relationship("LossRunFact")
 
     def __init__(self, insured_name, insured_address, insured_status):
         self.insured_name = insured_name
@@ -69,7 +66,6 @@ class PolicyDim(Base):
     policy_start_date = Column(DateTime)
     policy_end_date = Column(DateTime)
     policy_status = Column(String)
-    lossrun_facts = relationship("LossRunFact")
 
     def __init__(self, insured_id, insurer_id, policy_number, policy_start_date, policy_end_date, policy_status):
         self.insured_id = insured_id
@@ -85,7 +81,6 @@ class LossRunReportDim(Base):
     lossrunreport_id = Column(Integer, primary_key = True)
     lossrunreport_load_date = Column(DateTime)
     lossrunreport_date = Column(DateTime)
-    lossrun_facts = relationship("LossRunFact")
 
     def __init__(self, lossrunreport_load_date, lossrunreport_date):
         self.lossrunreport_load_date = lossrunreport_load_date
@@ -98,7 +93,6 @@ class ReportGeneratorDim(Base):
     reportgenerator_name = Column(String)
     reportgenerator_address = Column(String)
     reportgenerator_status = Column(String)
-    lossrun_facts = relationship("LossRunFact")
 
     def __init__(self, reportgenerator_name, reportgenerator_address, reportgenerator_status):
         self.reportgenerator_name = reportgenerator_name
@@ -126,11 +120,17 @@ class LossRunFact(Base):
     insured_id = Column(Integer, ForeignKey('insured_dim.insured_id'))
 
     timeDim = relationship('TimeDim', foreign_keys=[loss_date])
+    PolicyDim = relationship('PolicyDim', foreign_keys=[policy_id])
+    reportedDate = relationship('TimeDim', foreign_keys=[loss_reported_date])
+    statusDim = relationship('StatusDim', foreign_keys=[status_id])
+    lossRunReportDim = relationship('LossRunReportDim', foreign_keys=[lossrunreport_id])
+    reportGeneratorDim = relationship('ReportGeneratorDim', foreign_keys=[reportgenerator_id])
+    insurerDim = relationship('InsurerDim', foreign_keys=[insurer_id])
+    insuredDim = relationship('InsuredDim', foreign_keys=[insured_id])
 
-    def __init__(self, fact_id, loss_date, policy_id, loss_reported_date, claim_reference, status_id, claimant_name, 
+    def __init__(self, loss_date, policy_id, loss_reported_date, claim_reference, status_id, claimant_name, 
         expense_reserve, indemnity_reserve, expense_paid, indemnity_paid, total_incurred, lossrunreport_id, 
         reportgenerator_id, insurer_id, insured_id):
-        self.fact_id = fact_id
         self.loss_date = loss_date
         self.policy_id = policy_id
         self.loss_reported_date = loss_reported_date
@@ -147,26 +147,37 @@ class LossRunFact(Base):
         self.insurer_id = insurer_id
         self.insured_id = insured_id
 
-# Create tables on db
-Base.metadata.create_all(engine)
 
-# Create random records for db
-timeDim = TimeDim(4, 9, 2020)
-statusDim = StatusDim('Active')
-insurerDim = InsurerDim('Insurer Company', 'Address Company', 'Reported')
-insuredDim = InsuredDim('Insured Person', 'Address Person', 'Waiting')
-policyDim = PolicyDim(1, 1, 1234, datetime.datetime.now(), datetime.datetime.now(), 'status')
-lossRunReportDim = LossRunReportDim(datetime.datetime.now(), datetime.datetime.now())
-reportGeneratorDim = ReportGeneratorDim('Report insure', 'Reporter address', 'pending')
+def registerRecord(**kwargs):
+    emptyArgs = { 'timeDimDay': None, 'timeDimMonth': None, 'timeDimYear': None, 'statusDim': None, 'insurerDimName': None, 'insurerDimAddress': None, 
+    'insurerDimStatus': None, 'insuredDimName': None, 'insuredDimAddress': None, 'insuredDimStatus': None, 'policyDimInsuredId': None, 
+    'policyDimInsurerId': None, 'policy_number': None, 'statusName': None, 'policyDimStartDate': None, 'policyDimEndDate': None, 'expenseReserve': None, 'claimantName': None, 'policyDimStatus': None, 'lossRunReportDimLoadDate': None, 
+    'lossRunReportDimDate': None, 'reportGeneratorDimName': None, 'reportGeneratorDimAddress': None, 'reportGeneratorDimStatus': None, 'claimReference': None, 'indemnityReserve': None, 'expensePaid': None, 'indemnityPaid': None,
+    'totalIncurred': None }
+    completeArgs = {**emptyArgs, **kwargs}
+    register(completeArgs)
 
-fact = LossRunFact(2, 2, 2, 2, 'Claimant Person', 2, 'Claimant Name', 12.2, 123.25, 89.36, 125.3, 78.3, 2, 2, 2, 2)
+def register(data):
+    timeDim = validateData(TimeDim, data['timeDimDay'], data['timeDimMonth'], data['timeDimYear'])
+    statusDim = validateData(StatusDim, data['statusName'])
+    insurerDim = validateData(InsurerDim, data['insurerDimName'], data['insurerDimAddress'], data['insurerDimStatus'])
+    insuredDim = validateData(InsuredDim, data['insuredDimName'], data['insuredDimAddress'], data['insuredDimStatus'])
+    policyDim = validateData(PolicyDim, data['policyDimInsuredId'], data['policyDimInsurerId'], data['policy_number'], data['policyDimStartDate'], data['policyDimEndDate'], data['policyDimStatus'])
+    lossRunReportDim = validateData(LossRunReportDim, data['lossRunReportDimLoadDate'], data['lossRunReportDimDate'])
+    reportGeneratorDim = validateData(ReportGeneratorDim, data['reportGeneratorDimName'], data['reportGeneratorDimAddress'], data['reportGeneratorDimStatus'])
+    fact = LossRunFact(timeDim.timeid, policyDim.policy_id, timeDim.timeid, data['claimReference'], statusDim.status_id, data['claimantName'], data['expenseReserve'], data['indemnityReserve'], data['expensePaid'], data['indemnityPaid'], data['totalIncurred'], lossRunReportDim.lossrunreport_id, reportGeneratorDim.reportgenerator_id, insurerDim.insurer_id, insuredDim.insured_id)
+    Session.add(fact)
+    Session.commit()
 
-Session.add(timeDim)
-Session.add(statusDim)
-Session.add(insurerDim)
-Session.add(insuredDim)
-Session.add(policyDim)
-Session.add(lossRunReportDim)
-Session.add(reportGeneratorDim)
-Session.add(fact)
-Session.commit()
+def validateData(objectClass, *args):
+    if all(value is None for value in args):
+        return None
+    else:
+        dataObject = objectClass(*args)
+        Session.add(dataObject)
+        Session.flush()
+        return dataObject
+
+registerRecord(timeDimDay = 12, timeDimMonth = 9, timeDimYear = 20, policyDimStartDate = datetime.datetime.now(), policyDimStatus = "Test", 
+    reportGeneratorDimName = "Report generator", insuredDimName = "Insured Name",  insurerDimName = "test", statusName = "fasdfdsa", 
+    lossRunReportDimDate = datetime.datetime.now())    
