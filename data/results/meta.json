@@ -455,7 +455,6 @@
       "EVENT",
       "FAC",
       "GPE",
-      "INSURER",
       "LANGUAGE",
       "LAW",
       "LOC",
@@ -466,8 +465,11 @@
       "ORG",
       "PERCENT",
       "PERSON",
+      "POLICY_NUM",
       "PRODUCT",
       "QUANTITY",
+      "REPORT_DATE",
+      "STATUS",
       "TIME",
       "WORK_OF_ART"
     ]

@@ -12,6 +12,32 @@ from spacy import displacy
 # load entity model
 
 
+def(spatial_filter, NER_model, config_rules_file)
+
+    nlp = spacy.load(NER_model)
+    # topic rules
+    ner_rules = ConfigObj(config_rules_file)
+
+    _temp = []
+    #
+    for i in range(len(spatial_filter)):
+
+        string = ' '.join(spatial_filter[:][i])
+        doc = nlp(string)
+        #displacy.serve(doc, style= 'ent')
+        
+        for ent in doc.ents:
+            print(ent.label_)
+
+        for j in range(len(ner_rules[topics[i][0]])):
+            
+            for ent in doc.ents:
+                
+                if ent.label_ in ner_rules[topics[i][0]]:
+                    #print(topics[i][0], ent.text, ner_rules[topics[i][0]], ent.label_)
+                    
+                    _temp += [(ent.text,ent.label_)] 
+    return _temp, doc.ents
 
 
 def load_context_model():
@@ -230,25 +256,29 @@ def search_rules(dictionary, rules):
                 asociate_terms = rules[item][i].split(' ')
                     
                 while asociate_terms[0] in sentence:
-                    position = poss.index(sentence.index(asociate_terms[0]))+1
-                    coord_x = _temp_dict['left'][position]
-                    coord_y = _temp_dict['top'][position]
-                    _aux = []
-                    for j in range(len(_temp_dict['text'])):
-                        dist_euc = np.sqrt((coord_x - _temp_dict['left'][j])**2 + (coord_y - _temp_dict['top'][j])**2)
-                       
-                        if dist_euc <= radius:
-                            _aux.append(_temp_dict['text'][j])
-                                    
                     
+                    try: 
+                        position = poss.index(sentence.index(asociate_terms[0]))+1
+                        coord_x = _temp_dict['left'][position]
+                        coord_y = _temp_dict['top'][position]
+                        _aux = []
+                        for j in range(len(_temp_dict['text'])):
+                            dist_euc = np.sqrt((coord_x - _temp_dict['left'][j])**2 + (coord_y - _temp_dict['top'][j])**2)
+                        
+                            if dist_euc <= radius:
+                                _aux.append(_temp_dict['text'][j])
+                                        
+                        
 
-                    if all(elem in _aux for elem in asociate_terms):
-                    
-                        _temp_dict['text'][poss.index(sentence.index(asociate_terms[0]))+1] = '}' * len(_temp_dict['text'][poss.index(sentence.index(asociate_terms[0]))+1])
-                        rules_coords  += [(item, asociate_terms[0], poss.index(sentence.index(asociate_terms[0]))+1, _temp_dict['left'][poss.index(sentence.index(asociate_terms[0]))+1] , _temp_dict['top'][poss.index(sentence.index(asociate_terms[0]))+1])]
-                        sentence = ' '.join(_temp_dict['text'])
-                       
-                    else:
+                        if all(elem in _aux for elem in asociate_terms):
+                        
+                            _temp_dict['text'][poss.index(sentence.index(asociate_terms[0]))+1] = '}' * len(_temp_dict['text'][poss.index(sentence.index(asociate_terms[0]))+1])
+                            rules_coords  += [(item, asociate_terms[0], poss.index(sentence.index(asociate_terms[0]))+1, _temp_dict['left'][poss.index(sentence.index(asociate_terms[0]))+1] , _temp_dict['top'][poss.index(sentence.index(asociate_terms[0]))+1])]
+                            sentence = ' '.join(_temp_dict['text'])
+                        
+                        else:
+                            break
+                    except:
                         break
             else:
                 pass

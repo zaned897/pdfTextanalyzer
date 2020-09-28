@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, Numeric, DateTime, ForeignKey
 import datetime
 
-engine = create_engine('postgresql://postgres:toor@localhost/lossrun', echo=True)
+engine = create_engine('postgresql://postgres:password@localhost/lossrun', echo=True)
 Session = sessionmaker(bind=engine)()
 Base = declarative_base()
 
@@ -177,6 +177,8 @@ def validateData(objectClass, *args):
         Session.add(dataObject)
         Session.flush()
         return dataObject
+
+Base.metadata.create_all(engine)
 
 registerRecord(timeDimDay = 12, timeDimMonth = 9, timeDimYear = 20, policyDimStartDate = datetime.datetime.now(), policyDimStatus = "Test", 
     reportGeneratorDimName = "Report generator", insuredDimName = "Insured Name",  insurerDimName = "test", statusName = "fasdfdsa", 
