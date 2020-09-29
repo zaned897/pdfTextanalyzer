@@ -1,3 +1,4 @@
+
 import ast # txt format
 import numpy as np # math library
 import copy
@@ -12,7 +13,7 @@ from spacy import displacy
 # load entity model
 
 
-def(spatial_filter, NER_model, config_rules_file)
+def NER_filer(spatial_filter, NER_model, config_rules_file):
 
     nlp = spacy.load(NER_model)
     # topic rules
@@ -283,4 +284,5 @@ def search_rules(dictionary, rules):
             else:
                 pass
 
-    return rules_coords 
+    return rules_coords
+

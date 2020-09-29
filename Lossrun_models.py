@@ -203,12 +203,8 @@ def validateData(objectClass, id_name, *args):
         Session.flush()
         return getattr(dataObject, id_name)
 
-<<<<<<< HEAD
 Base.metadata.create_all(engine)
 
 registerRecord(timeDimDay = 12, timeDimMonth = 9, timeDimYear = 20, policyDimStartDate = datetime.datetime.now(), policyDimStatus = "Test", 
     reportGeneratorDimName = "Report generator", insuredDimName = "Insured Name",  insurerDimName = "test", statusName = "fasdfdsa", 
     lossRunReportDimDate = datetime.datetime.now())    
-=======
-registerRecord(timeDimDay = 5, timeDimMonth = 12, statusName = 'Test') 
->>>>>>> 8c53cc267759ef19f8b0db7be1e5f9cc51d377cb
