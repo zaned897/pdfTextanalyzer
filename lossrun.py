@@ -155,7 +155,7 @@ def pre_proc(pdf_file, data_path, topic_file):
                     )
         center = (l + np.uint8(w/2), t + np.uint8(h/2))
         color = (0, 0, 255)
-        cv2.circle(_image_c, center, 8, color, -1)
+        cv2.circle(_image, center, 8, color, -1)
     return txt_dict, j, _image, _image_c
     
 def read_dict(txt_file_path):

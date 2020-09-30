@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, Numeric, DateTime, ForeignKey
 import datetime
 
-engine = create_engine('postgresql://postgres:toor@localhost/lossrun', echo=True)
+engine = create_engine('postgresql://rolename:passwordstring@localhost/lossrun', echo=True)
 Session = sessionmaker(bind=engine)()
 Base = declarative_base()
 
