@@ -1,5 +1,5 @@
-insurer = ORG,
-claimant = PERSON, ORG,
-policy_num = CARDINAL,
+insurer = ORGER,
+insured = ORGED,
+policy_num = ALPHANUM,
 status = OPEN, CLOSE,
 report_date = DATE,

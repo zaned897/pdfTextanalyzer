@@ -1,7 +1,8 @@
 import ast # txt format
 import numpy as np # math library
 import copy
-import cv2
+from cv2 import circle 
+from cv2 import imread
 import os
 from configobj import ConfigObj
 from tensorflow.keras.utils import get_file
@@ -106,21 +107,35 @@ def spatial_filter(txt_dict, topics):
     Returns:
         all_candidates: List with text in same column and same row
     '''
+
     all_candidates = []
-    for i in range(len(topics)):
-        (l, t, w, h) = (txt_dict['left'][topics[i][2]],
-                    txt_dict['top'][topics[i][2]],
-                    txt_dict['width'][topics[i][2]],
-                    txt_dict['height'][topics[i][2]]
+    for topic in range(len(topics)):
+        (l, t, w, h) = (txt_dict['left'][topics[topic][2]],
+                    txt_dict['top'][topics[topic][2]],
+                    txt_dict['width'][topics[topic][2]],
+                    txt_dict['height'][topics[topic][2]]
                     )
+        vertical_candidates = []
+        horizontal_candidates = []
         for i in range(len(txt_dict['text'])):
             txt_left = txt_dict['left'][i]
             txt_top = txt_dict['top'][i]
             txt_text = txt_dict['text'][i]
+
             if (txt_left > l - w and txt_left < l + w and txt_top > t):
-                all_candidates.append(txt_text)
+                vertical_candidates.append(txt_text)
+        
+        for i in range(len(txt_dict['text'])):
+            txt_left = txt_dict['left'][i]
+            txt_top = txt_dict['top'][i]
+            txt_text = txt_dict['text'][i]
+
             if (txt_top > t - h and txt_top < t + h and txt_left > l):
-                all_candidates.append(txt_text)
+                horizontal_candidates.append(txt_text)
+
+
+
+        all_candidates +=  [vertical_candidates + horizontal_candidates]
     return all_candidates
 
 def pre_proc(pdf_file, data_path, topic_file):
@@ -143,8 +158,8 @@ def pre_proc(pdf_file, data_path, topic_file):
     template_rules = ConfigObj(topic_file)
     # Search topic in text raw dict
     j = search_rules(txt_dict,template_rules)
-    _image_c = cv2.imread(image_file) 
-    _image = cv2.imread(image_file) 
+    _image_c = imread(image_file) 
+    _image = imread(image_file) 
 
     for i in range(len(j)):
     # Box dimentions
@@ -155,7 +170,7 @@ def pre_proc(pdf_file, data_path, topic_file):
                     )
         center = (l + np.uint8(w/2), t + np.uint8(h/2))
         color = (0, 0, 255)
-        cv2.circle(_image, center, 8, color, -1)
+        circle(_image, center, 8, color, -1)
     return txt_dict, j, _image, _image_c
     
 def read_dict(txt_file_path):
