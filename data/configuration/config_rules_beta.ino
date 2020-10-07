@@ -1,5 +1,5 @@
 insurer = ORGER,
 insured = ORGED,
 policy_num = ALPHANUM,
-status = OPEN, CLOSE,
+status = STATUS,
 report_date = DATE,
