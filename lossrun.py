@@ -1,20 +1,107 @@
-import ast # txt format
-import numpy as np # math library
+import os
+import ast
+from configobj import ConfigObj
+import numpy as np
 import copy
 from cv2 import circle 
 from cv2 import imread
-import os
-from configobj import ConfigObj
-from tensorflow.keras.utils import get_file
-from gensim.models import KeyedVectors
-import spacy
-from spacy import displacy
+from cv2 import imwrite
+from cv2 import resize
 from pdf2image import convert_from_path
 import pytesseract as pt
 from pytesseract import Output
 
+def update_files_in_path(root = './data/pdfs/', log_file = 'log_file.txt'):
+    
 
-def transform_to_text_an_entire_folder(images_folder = './data/images/', text_folder = './data/txt/', save_string = False):
+    # get the actual files in path
+    current = os.listdir(root)
+    # get the log of the last modificated files
+    
+    try:
+        _file = open(root + log_file, "r+")
+        old = _file.read().splitlines()
+        _file.close()
+    except:
+        _file = open(root + log_file, "w")  
+    
+    # check modifications
+    modified = list(set(current) - set(old)) + list(set(old) - set(current))
+    #all_mod = list(set(old) - set(modified)) + modified
+
+    # re-write the directory 
+    with open(root + log_file, 'w') as f:
+        for _file in current:
+            f.write("%s\n" % _file)
+
+    return modified
+
+def transform_to_images_an_entire_folder(pdfs_folder = './data/pdfs/', images_folder = './data/images/', format = '.jpg', log_file = 'log_file.txt'):
+    '''
+    Transform all .pdf files into .jpg in specific folder ans store the images in default folder ./data/iamges/ .
+    Args. 
+        pdfs_folder: Folder path containing all pdf reports i. e., ./data/pdfs.
+        images_folder: Folder path where results were stored.
+        format: target format for images. 
+    Returns.
+        False if error in source path, or True if success
+    '''
+
+    # Validate pdf folder
+    try:
+        os.listdir(pdfs_folder)
+    except:
+        print("Error in path: " + pdfs_folder, 'It doesn exist or wrong path name')
+        return False   
+
+    # Create the target folder if it doesn't exists
+    try:
+        os.mkdir(images_folder)
+    except FileExistsError:
+        pass
+
+
+    # for each .pdf modified, convert it into .jpg
+    modified_files = update_files_in_path(root=pdfs_folder, log_file=log_file)
+
+    for _file in modified_files: # process modified files
+        if _file[-3:] == 'pdf': # process only pdf format images
+            try:
+                image_proto = convert_from_path(pdfs_folder + _file) # if the pdf file is not corrupted proceed
+                
+                if len(image_proto)>1:  # if there are several pages in the pdf file 
+                    merged = np.array(image_proto[0])[:,:,0] # optimize process taking only a gray image
+                    height = merged.shape[0]
+                    width =  merged.shape[1]
+
+                    for i in range(1, len(image_proto)):
+                        y = np.array(image_proto[i])[:,:,0]
+                        try:    
+                            merged = np.append(merged, y, axis = 1)
+                        except: 
+                            try:
+                                merged = np.append(merged,y.T,axis = 1)
+                            except:                                 
+                                y_resized = resize(y, dsize=(width,height))
+                                merged = np.append(merged, y_resized, axis = 1)   
+                    imwrite(images_folder + _file[:-4] + format, merged)
+                    
+                elif len(image_proto)==1:
+                
+                    imwrite(images_folder + _file[:-4] + format, np.array(image_proto))
+
+                else:
+                    print('Error in file: ' + images_folder + _file)
+                    return False
+            
+                #Multiple images pdf
+                #image_proto = convert_from_path(pdfs_folder  + _file)
+                #[image.save(images_folder + _file[:-4] + str(page) + format) for page, image in enumerate(image_proto)]                            
+            except:
+                print('File: ' + str(_file) + 'delated or corrupted')
+    return True
+
+def transform_to_text_an_entire_folder(images_folder = './data/images/', text_folder = './data/txt/', save_string = False,log_file='log_file.txt'):
 
     '''
     Transform all images files supported into .txt as string or dictionary in specific folder and store it in a target folder
@@ -29,7 +116,7 @@ def transform_to_text_an_entire_folder(images_folder = './data/images/', text_fo
 
     # Read soruce files
     try:
-        list_files = os.listdir(images_folder)
+        os.listdir(images_folder)
     except:
         print("Error in path: " + images_folder, 'It doesn exist or wrong path name')
         return False   
@@ -40,64 +127,22 @@ def transform_to_text_an_entire_folder(images_folder = './data/images/', text_fo
     except FileExistsError:
         pass
 
+    modified = update_files_in_path(root=images_folder, log_file=log_file)
     # For each file with image format in path, convert it into .txt file
-    for _file in list_files:
-        try: 
-            pt.image_to_string(images_folder + _file)
-            txt_file  = open(text_folder  + _file[:-3] + "txt", "w")
-            if save_string:
-                txt_file.write(str(pt.image_to_string(images_folder + _file)))
-            else:
-                txt_file.write(str(pt.image_to_data(images_folder + _file, output_type =Output.DICT)))
-        except: 
-            print('File: ' + images_folder + _file + ' not supported')
+    for _file in modified:
+        try:
+            try: 
+                pt.image_to_string(images_folder + _file)
+                txt_file  = open(text_folder  + _file[:-3] + "txt", "w")
+                if save_string:
+                    txt_file.write(str(pt.image_to_string(images_folder + _file)))
+                else:
+                    txt_file.write(str(pt.image_to_data(images_folder + _file, output_type =Output.DICT)))
+            except: 
+                print('File: ' + images_folder + _file + ' not supported')
+        except:
+           print('File: ' + str(_file) + 'delated')
     return True
-
-
-def transform_to_images_an_entire_folder(pdfs_folder = './data/pdfs/', images_folder = './data/images/', format = '.jpg'):
-    '''
-    Transform all .pdf files into .jpg in specific folder ans store the images in default folder ./data/iamges/ .
-    Args. 
-        pdfs_folder: Folder path containing all pdf reports i. e., ./data/pdfs.
-        images_folder: Folder path where results were stored.
-        format: target format for images. 
-    Returns.
-        False if error in source path, or True if success
-    '''
-
-    # Validate pdf folder
-    try:
-        list_files = os.listdir(pdfs_folder)
-    except:
-        print("Error in path: " + pdfs_folder, 'It doesn exist or wrong path name')
-        return False   
-
-    # Create the target folder if it doesn't exists
-    try:
-        os.mkdir(images_folder)
-    except FileExistsError:
-        pass
-    # for each .pdf found, convert it into .jpg
-    for _file in list_files:
-        if _file[-3:] == 'pdf':
-            image_proto = convert_from_path(pdfs_folder  + _file)
-            [image.save(images_folder + _file[:-4] + str(page) + format) for page, image in enumerate(image_proto)]                            
-        
-    return True
-
-
-def load_context_model(context_model_path = '/home/zned897/.keras/datasets/GoogleNews-vectors-negative300.bin.gz'):
-    '''Load context model.
-    Args. 
-        grammar and contextual model path.
-    Returns:
-        model: A pre-trained model
-    '''
-    path = context_model_path
-    
-    # load gensim model
-    model = KeyedVectors.load_word2vec_format(path, binary=True)
-    return model
 
 def spatial_filter(txt_dict, topics):
     '''Creates a list of words related by possotin related in , 
@@ -138,7 +183,7 @@ def spatial_filter(txt_dict, topics):
         all_candidates +=  [vertical_candidates + horizontal_candidates]
     return all_candidates
 
-def pre_proc(pdf_file, data_path, topic_file):
+def pre_proc(pdf_file, data_path, topic_file, image_format = '.png', text_format = '.txt'):
     '''Read raw txt info in pdf report, text file and image then search a topic and create a circle for each target
     Args:
         pdf_file (str): The PDF file name
@@ -153,11 +198,12 @@ def pre_proc(pdf_file, data_path, topic_file):
     PATH_txt = os.path.join('.', data_path, 'txt','')
     PATH_image = os.path.join('.', data_path, 'images','')
     txt_file = PATH_txt + pdf_file + '.txt'
-    image_file = PATH_image + pdf_file + '.jpg'
+    image_file = PATH_image + pdf_file + '.png'
     txt_dict = read_dict(txt_file)
     template_rules = ConfigObj(topic_file)
     # Search topic in text raw dict
     j = search_rules(txt_dict,template_rules)
+    print(image_file )
     _image_c = imread(image_file) 
     _image = imread(image_file) 
 
@@ -291,27 +337,31 @@ def search_rules(dictionary, rules):
                 asociate_terms = rules[item][i].split(' ')
                     
                 while asociate_terms[0] in sentence:
-                    position = poss.index(sentence.index(asociate_terms[0]))+1
-                    coord_x = _temp_dict['left'][position]
-                    coord_y = _temp_dict['top'][position]
-                    _aux = []
-                    for j in range(len(_text_temp_dict)):
-                        dist_euc = np.sqrt((coord_x - _temp_dict['left'][j])**2 + (coord_y - _temp_dict['top'][j])**2)
-                       
-                        if dist_euc <= radius:
-                            _aux.append(_text_temp_dict[j])
-                                    
-                    
+                    try:
+                        position = poss.index(sentence.index(asociate_terms[0]))+1
+                        coord_x = _temp_dict['left'][position]
+                        coord_y = _temp_dict['top'][position]
+                        _aux = []
+                        for j in range(len(_text_temp_dict)):
+                            dist_euc = np.sqrt((coord_x - _temp_dict['left'][j])**2 + (coord_y - _temp_dict['top'][j])**2)
+                        
+                            if dist_euc <= radius:
+                                _aux.append(_text_temp_dict[j])
+                                        
+                        
 
-                    if all(elem in _aux for elem in asociate_terms):
-                    
-                        _text_temp_dict[poss.index(sentence.index(asociate_terms[0]))+1] = '}' * len(_text_temp_dict[poss.index(sentence.index(asociate_terms[0]))+1])
-                        rules_coords  += [(item, asociate_terms[0], poss.index(sentence.index(asociate_terms[0]))+1, _temp_dict['left'][poss.index(sentence.index(asociate_terms[0]))+1] , _temp_dict['top'][poss.index(sentence.index(asociate_terms[0]))+1])]
-                        sentence = ' '.join(_text_temp_dict)
-                       
-                    else:
+                        if all(elem in _aux for elem in asociate_terms):
+                        
+                            _text_temp_dict[poss.index(sentence.index(asociate_terms[0]))+1] = '}' * len(_text_temp_dict[poss.index(sentence.index(asociate_terms[0]))+1])
+                            rules_coords  += [(item, asociate_terms[0], poss.index(sentence.index(asociate_terms[0]))+1, _temp_dict['left'][poss.index(sentence.index(asociate_terms[0]))+1] , _temp_dict['top'][poss.index(sentence.index(asociate_terms[0]))+1])]
+                            sentence = ' '.join(_text_temp_dict)
+                        
+                        else:
+                            break
+                    except:
                         break
             else:
                 pass
 
     return rules_coords 
+
