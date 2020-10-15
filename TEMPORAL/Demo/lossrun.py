@@ -373,24 +373,26 @@ def search_rules(dictionary, rules):
 
 
 def is_report(image, txt):
-
     """
     Compare logos, and text content to determinate if the file is a loss report, email or NPDB document 
 
     Args.
         image(np.array): image in numpy format 
-    text(dic): dictionary extracted from OCR stage
+        text(dic): dictionary extracted from OCR stage
 
     Returns.
         String: email, NPDB, lossrun
     """
 
+
     content =' '.join(txt['text'])
     if ('FROM:'in content.upper()) and ('SENT:'in content.upper()) and ('@' in content.upper()):
         return 'email'
     elif 'NPDB' in content.upper():
-        return 'NPDB'
+        return ('NPDB', ConfigObj('config/config_npdb_topics.ino'),ConfigObj('config/config_npdb_entities.ino'))
     
     elif ('STATUS' in content.upper()) or ('STATUS' in content.upper()) or ('STUS' in content.upper()):
-        return 'lossrun'
+        return ('LOSSRUN', ConfigObj('config/config_lossrun_topics.ino'),ConfigObj('config/config_lossrun_entities.ino'))
+    else:
+        return 'any'
     

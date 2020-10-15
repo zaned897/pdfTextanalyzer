@@ -1,0 +1,6 @@
+insurer = CARRIER, INSURER, ENTITY NAME,
+policy_num = CONTRACT,
+insured = INSURED NAME:, SUBJECT NAME, INSURED, CONSUMER:,
+status = STATUS,
+report_date = LOSS DATE,
+total_incured = INCURRED,
