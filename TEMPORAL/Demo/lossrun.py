@@ -10,6 +10,17 @@ from cv2 import resize
 from pdf2image import convert_from_path
 import pytesseract as pt
 from pytesseract import Output
+from tensorflow.keras.utils import get_file
+from gensim.models import KeyedVectors
+
+def load_context_model():
+    '''Load context model.
+    Returns:
+        model: A pre-trained model
+    '''
+    path = '/home/zned897/.keras/datasets/GoogleNews-vectors-negative300.bin.gz'
+    model = KeyedVectors.load_word2vec_format(path, binary=True)
+    return model
 
 
 def update_files_in_path(root = './data/pdfs/', log_file = 'log_file.txt'):
@@ -147,7 +158,7 @@ def transform_to_text_an_entire_folder(images_folder = './data/images/', text_fo
            print('File: ' + str(_file) + 'delated')
     return True
 
-def spatial_filter(txt_dict, topics):
+def spatial_filter(txt_dict, topics, report_type):
     '''Creates a list of words related by possotin related in , 
     Args:
         txt_dict (dict): Dictionary with raw txt info in pdf report
@@ -165,22 +176,58 @@ def spatial_filter(txt_dict, topics):
                     )
         vertical_candidates = []
         horizontal_candidates = []
-        for i in range(len(txt_dict['text'])):
-            txt_left = txt_dict['left'][i]
-            txt_top = txt_dict['top'][i]
-            txt_text = txt_dict['text'][i]
 
-            if (txt_left > l - w and txt_left < l + w and txt_top > t):
-                vertical_candidates.append(txt_text)
-        
-        for i in range(len(txt_dict['text'])):
-            txt_left = txt_dict['left'][i]
-            txt_top = txt_dict['top'][i]
-            txt_text = txt_dict['text'][i]
+        if report_type == 'LOSSRUN':
+            for i in range(len(txt_dict['text'])):
+                txt_left = txt_dict['left'][i]
+                txt_top = txt_dict['top'][i]
+                txt_text = txt_dict['text'][i]
 
-            if (txt_top > t - h and txt_top < t + h and txt_left > l):
-                horizontal_candidates.append(txt_text)
+                if (txt_left > l - w and txt_left < l + w and txt_top > t):
+                    vertical_candidates.append(txt_text)
+            
+            for i in range(len(txt_dict['text'])):
+                txt_left = txt_dict['left'][i]
+                txt_top = txt_dict['top'][i]
+                txt_text = txt_dict['text'][i]
 
+                if (txt_top > t - h and txt_top < t + h and txt_left > l) and (txt_left-(l + w)<300):
+                    horizontal_candidates.append(txt_text)
+
+        elif report_type == 'NPDB':
+                    for i in range(len(txt_dict['text'])):
+                        txt_left = txt_dict['left'][i]
+                        txt_top = txt_dict['top'][i]
+                        txt_text = txt_dict['text'][i]
+
+                        if (txt_top > t - h and txt_top < t + h and txt_left > l) and (txt_left-(l + w)<500):
+                            horizontal_candidates.append(txt_text)
+        elif report_type == 'EMAIL':
+
+                    for i in range(len(txt_dict['text'])):
+                        txt_left = txt_dict['left'][i]
+                        txt_top = txt_dict['top'][i]
+                        txt_text = txt_dict['text'][i]
+                        
+                        if (txt_top > t - h and txt_top < t + h and txt_left > l) and (txt_left-(l + w)<800):
+                            horizontal_candidates.append(txt_text)
+        else:
+
+            for i in range(len(txt_dict['text'])):
+                txt_left = txt_dict['left'][i]
+                txt_top = txt_dict['top'][i]
+                txt_text = txt_dict['text'][i]
+
+                if (txt_left > l - w and txt_left < l + w and txt_top > t):
+                    vertical_candidates.append(txt_text)
+            
+            for i in range(len(txt_dict['text'])):
+                txt_left = txt_dict['left'][i]
+                txt_top = txt_dict['top'][i]
+                txt_text = txt_dict['text'][i]
+
+                if (txt_top > t - h and txt_top < t + h and txt_left > l):
+                    horizontal_candidates.append(txt_text)
 
 
         all_candidates +=  [vertical_candidates + horizontal_candidates]
@@ -387,7 +434,7 @@ def is_report(image, txt):
 
     content =' '.join(txt['text'])
     if ('FROM:'in content.upper()) and ('SENT:'in content.upper()) and ('@' in content.upper()):
-        return 'email'
+        return ('EMAIL',ConfigObj('config/config_email_topics.ino'),ConfigObj('config/config_email_entities.ino'))
     elif 'NPDB' in content.upper():
         return ('NPDB', ConfigObj('config/config_npdb_topics.ino'),ConfigObj('config/config_npdb_entities.ino'))
     
