@@ -11,28 +11,6 @@ from pdf2image import convert_from_path
 import pytesseract as pt
 from pytesseract import Output
 
-def is_report(image, txt)
-'''
-Compare logos, and text content to determinate if the file is a loss report, email or NPDB document 
-
-Args.
-    image(np.array): image in numpy format 
-    text(dic): dictionary extracted from OCR stage
-
-Returns.
-    String: email, NPDB, lossrun
-
-'''
-
-    content =' '.join(txt['text'])
-    if ('FROM:'in content.upper()) and ('SENT:'in content.upper()) and ('@' in content.upper()):
-        return 'email'
-    if  'NPDB' in content.upper():
-        return 'NPDB'
-    
-
-
-
 
 def update_files_in_path(root = './data/pdfs/', log_file = 'log_file.txt'):
     
@@ -393,3 +371,26 @@ def search_rules(dictionary, rules):
 
     return rules_coords 
 
+
+def is_report(image, txt):
+
+"""
+Compare logos, and text content to determinate if the file is a loss report, email or NPDB document 
+
+Args.
+    image(np.array): image in numpy format 
+    text(dic): dictionary extracted from OCR stage
+
+Returns.
+    String: email, NPDB, lossrun
+"""
+
+    content =' '.join(txt['text'])
+    if ('FROM:'in content.upper()) and ('SENT:'in content.upper()) and ('@' in content.upper()):
+        return 'email'
+    elif 'NPDB' in content.upper():
+        return 'NPDB'
+    
+    elif ('STATUS' in content.upper()) or ('STATUS' in content.upper()) or ('STUS' in content.upper()):
+        return 'lossrun'
+    
