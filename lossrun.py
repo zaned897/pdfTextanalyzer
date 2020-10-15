@@ -11,6 +11,29 @@ from pdf2image import convert_from_path
 import pytesseract as pt
 from pytesseract import Output
 
+def is_report(image, txt)
+'''
+Compare logos, and text content to determinate if the file is a loss report, email or NPDB document 
+
+Args.
+    image(np.array): image in numpy format 
+    text(dic): dictionary extracted from OCR stage
+
+Returns.
+    String: email, NPDB, lossrun
+
+'''
+
+    content =' '.join(txt['text'])
+    if ('FROM:'in content.upper()) and ('SENT:'in content.upper()) and ('@' in content.upper()):
+        return 'email'
+    if  'NPDB' in content.upper():
+        return 'NPDB'
+    
+
+
+
+
 def update_files_in_path(root = './data/pdfs/', log_file = 'log_file.txt'):
     
 
@@ -23,7 +46,8 @@ def update_files_in_path(root = './data/pdfs/', log_file = 'log_file.txt'):
         old = _file.read().splitlines()
         _file.close()
     except:
-        _file = open(root + log_file, "w")  
+        _file = open(root + log_file, "w") 
+        old = []
     
     # check modifications
     modified = list(set(current) - set(old)) + list(set(old) - set(current))
@@ -87,18 +111,19 @@ def transform_to_images_an_entire_folder(pdfs_folder = './data/pdfs/', images_fo
                     imwrite(images_folder + _file[:-4] + format, merged)
                     
                 elif len(image_proto)==1:
-                
-                    imwrite(images_folder + _file[:-4] + format, np.array(image_proto))
+
+                    imwrite(images_folder + _file[:-4] + format, np.array(image_proto[0]))
 
                 else:
-                    print('Error in file: ' + images_folder + _file)
+                    
+                    print('Error in file: ' + images_folder + _file, len(image_proto[0]))
                     return False
             
                 #Multiple images pdf
                 #image_proto = convert_from_path(pdfs_folder  + _file)
                 #[image.save(images_folder + _file[:-4] + str(page) + format) for page, image in enumerate(image_proto)]                            
             except:
-                print('File: ' + str(_file) + 'delated or corrupted')
+                print('File: ' + str(_file) + ' delated or corrupted')
     return True
 
 def transform_to_text_an_entire_folder(images_folder = './data/images/', text_folder = './data/txt/', save_string = False,log_file='log_file.txt'):
@@ -326,9 +351,12 @@ def search_rules(dictionary, rules):
                 while rules[item][i] in sentence: 
                     # text 
                         
-                    _text_temp_dict[poss.index(sentence.index(rules[item][i]))+1] = '?' * len(_text_temp_dict[poss.index(sentence.index(rules[item][i]))+1])
-                    rules_coords += [(item, rules[item][i],poss.index(sentence.index(rules[item][i]))+1, _temp_dict['left'][poss.index(sentence.index(rules[item][i]))+1], _temp_dict['top'][poss.index(sentence.index(rules[item][i]))+1])]
-                    sentence = ' '.join(_text_temp_dict)
+                    try:
+                        _text_temp_dict[poss.index(sentence.index(rules[item][i]))+1] = '?' * len(_text_temp_dict[poss.index(sentence.index(rules[item][i]))+1])
+                        rules_coords += [(item, rules[item][i],poss.index(sentence.index(rules[item][i]))+1, _temp_dict['left'][poss.index(sentence.index(rules[item][i]))+1], _temp_dict['top'][poss.index(sentence.index(rules[item][i]))+1])]
+                        sentence = ' '.join(_text_temp_dict)
+                    except:
+                        break
 
 
             # if there is some part of the rule
