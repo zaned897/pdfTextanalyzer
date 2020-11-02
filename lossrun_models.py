@@ -160,18 +160,20 @@ class NPDB(Base):
     entity_name = Column(String)
     payment_id = Column(Integer, ForeignKey('payment_npdb.payment_id'))
     event_id = Column(Integer, ForeignKey('event_npdb.event_id'))
+    relevant = Column(Boolean)
 
     action = relationship('Action', foreign_keys=[action_id])
     payment = relationship('Payment', foreign_keys=[payment_id])
     event = relationship('Event', foreign_keys=[event_id])
 
-    def __init__(self, process_date, practitioner_name, action_id, entity_name, payment_id, event_id):
+    def __init__(self, process_date, practitioner_name, action_id, entity_name, payment_id, event_id, relevant):
         self.process_date = process_date
         self.practitioner_name = practitioner_name
         self.action_id = action_id
         self.entity_name = entity_name
         self.payment_id = payment_id
         self.event_id = event_id
+        self.relevant = relevant
 
 class LossRunFact(Base):
     __tablename__ = 'lossrun_fact'
@@ -256,7 +258,7 @@ def register(data):
 
 def npdbRecord(**kwargs):
     emptyArgs = { 'event_day': None, 'event_outcome': None, 'event_paid_by': None, 'payment_date': None, 'payment_total_amount': None, 'action_initial': None, 
-    'action_basis': None, 'process_date': None, 'practitioner_name': None, 'entity_name': None }
+    'action_basis': None, 'process_date': None, 'practitioner_name': None, 'entity_name': None, 'relevant': False }
     completeArgs = {**emptyArgs, **kwargs}
     registerNPDB(completeArgs)
 
@@ -264,7 +266,7 @@ def registerNPDB(data):
     event = validateData(Event, 'event_id', data['event_day'], data['event_outcome'], data['event_paid_by'])
     payment = validateData(Payment, 'payment_id', data['payment_date'], data['payment_total_amount'])
     action = validateData(Action, 'action_id', data['action_initial'], data['action_basis'])
-    npdb = NPDB(data['process_date'], data['practitioner_name'], action, data['entity_name'], payment, event)
+    npdb = NPDB(data['process_date'], data['practitioner_name'], action, data['entity_name'], payment, event, data['relevant'])
     Session.add(npdb)
     Session.commit()
 
@@ -281,3 +283,4 @@ registerRecord(timeDimDay = 5, timeDimMonth = 12, statusName = 'Test', relevant 
 npdbRecord(process_date = datetime.datetime.now(), practitioner_name = "Test practitioner", action_initial = 'Test initial action', 
     action_basis = 'Basis', entity_name = 'Entity first name', payment_date = datetime.datetime.now(), payment_total_amount = 5000, event_day = datetime.datetime.now(), 
     event_outcome = 'test', event_paid_by = 'Company 1')
+    
