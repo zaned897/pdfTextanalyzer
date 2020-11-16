@@ -1,0 +1,11 @@
+pract_name = PERSON, ORG
+//ref_number = CARDINAL,
+proc_date = DATE,
+paid_date = DATE,
+event_date = DATE,
+ent_name = ORG, PERSON,
+paid_by = MONEY,
+total_pract = MONEY,
+outcome = ,
+npi = CARDINAL,
+licnece = CARDINAL,
