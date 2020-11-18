@@ -160,20 +160,26 @@ class NPDB(Base):
     entity_name = Column(String)
     payment_id = Column(Integer, ForeignKey('payment_npdb.payment_id'))
     event_id = Column(Integer, ForeignKey('event_npdb.event_id'))
-    relevant = Column(Boolean)
+    report_found = Column(Boolean)
+    dcn = Column(String)
+    npi = Column(String)
+    amount_pract = Column(Integer)
 
     action = relationship('Action', foreign_keys=[action_id])
     payment = relationship('Payment', foreign_keys=[payment_id])
     event = relationship('Event', foreign_keys=[event_id])
 
-    def __init__(self, process_date, practitioner_name, action_id, entity_name, payment_id, event_id, relevant):
+    def __init__(self, process_date, practitioner_name, action_id, entity_name, payment_id, event_id, report_found, dcn, npi, amount_pract):
         self.process_date = process_date
         self.practitioner_name = practitioner_name
         self.action_id = action_id
         self.entity_name = entity_name
         self.payment_id = payment_id
         self.event_id = event_id
-        self.relevant = relevant
+        self.report_found = report_found
+        self.dcn = dcn
+        self.npi = npi
+        self.amount_pract = amount_pract
 
 class LossRunFact(Base):
     __tablename__ = 'lossrun_fact'
@@ -190,7 +196,7 @@ class LossRunFact(Base):
     expense_paid = Column(Numeric)
     indemnity_paid = Column(Numeric)
     total_incurred = Column(Numeric)
-    relevant = Column(Boolean)
+    report_found = Column(Boolean)
     lossrunreport_id = Column(Integer, ForeignKey('lossrunreport_dim.lossrunreport_id'))
     reportgenerator_id = Column(Integer, ForeignKey('reportgenerator_dim.reportgenerator_id'))
     insurer_id = Column(Integer, ForeignKey('insurer_dim.insurer_id'))
@@ -214,7 +220,7 @@ class LossRunFact(Base):
         return field
 
     def __init__(self, loss_date, policy_id, loss_reported_date, claim_reference, status_id, claimant_name, 
-        expense_reserve, indemnity_reserve, expense_paid, indemnity_paid, total_incurred, relevant, lossrunreport_id, 
+        expense_reserve, indemnity_reserve, expense_paid, indemnity_paid, total_incurred, report_found, lossrunreport_id, 
         reportgenerator_id, insurer_id, insured_id):
         self.loss_date = loss_date
         self.policy_id = policy_id
@@ -227,7 +233,7 @@ class LossRunFact(Base):
         self.expense_paid = expense_paid
         self.indemnity_paid = indemnity_paid
         self.total_incurred = total_incurred
-        self.relevant = relevant
+        self.report_found = report_found
         self.lossrunreport_id = lossrunreport_id
         self.reportgenerator_id = reportgenerator_id
         self.insurer_id = insurer_id
@@ -240,7 +246,7 @@ def registerRecord(**kwargs):
     'insurerDimStatus': None, 'insuredDimName': None, 'insuredDimAddress': None, 'insuredDimStatus': None, 'policyDimInsuredId': None, 
     'policyDimInsurerId': None, 'policy_number': None, 'statusName': None, 'policyDimStartDate': None, 'policyDimEndDate': None, 'expenseReserve': None, 'claimantName': None, 'policyDimStatus': None, 'lossRunReportDimLoadDate': None, 
     'lossRunReportDimDate': None, 'reportGeneratorDimName': None, 'reportGeneratorDimAddress': None, 'reportGeneratorDimStatus': None, 'claimReference': None, 'indemnityReserve': None, 'expensePaid': None, 'indemnityPaid': None,
-    'totalIncurred': None, 'relevant': False }
+    'totalIncurred': None, 'report_found': False }
     completeArgs = {**emptyArgs, **kwargs}
     register(completeArgs)
 
@@ -252,13 +258,13 @@ def register(data):
     policyDim = validateData(PolicyDim, 'policy_id', data['policyDimInsuredId'], data['policyDimInsurerId'], data['policy_number'], data['policyDimStartDate'], data['policyDimEndDate'], data['policyDimStatus'])
     lossRunReportDim = validateData(LossRunReportDim, 'lossrunreport_id', data['lossRunReportDimLoadDate'], data['lossRunReportDimDate'])
     reportGeneratorDim = validateData(ReportGeneratorDim, 'reportgenerator_id', data['reportGeneratorDimName'], data['reportGeneratorDimAddress'], data['reportGeneratorDimStatus'])
-    fact = LossRunFact(timeDim, policyDim, timeDim, data['claimReference'], statusDim, data['claimantName'], data['expenseReserve'], data['indemnityReserve'], data['expensePaid'], data['indemnityPaid'], data['totalIncurred'], data['relevant'], lossRunReportDim, reportGeneratorDim, insurerDim, insuredDim)
+    fact = LossRunFact(timeDim, policyDim, timeDim, data['claimReference'], statusDim, data['claimantName'], data['expenseReserve'], data['indemnityReserve'], data['expensePaid'], data['indemnityPaid'], data['totalIncurred'], data['report_found'], lossRunReportDim, reportGeneratorDim, insurerDim, insuredDim)
     Session.add(fact)
     Session.commit()
 
 def npdbRecord(**kwargs):
     emptyArgs = { 'event_day': None, 'event_outcome': None, 'event_paid_by': None, 'payment_date': None, 'payment_total_amount': None, 'action_initial': None, 
-    'action_basis': None, 'process_date': None, 'practitioner_name': None, 'entity_name': None, 'relevant': False }
+    'action_basis': None, 'process_date': None, 'practitioner_name': None, 'entity_name': None, 'report_found': False, 'dcn': None, 'npi': None, 'amount_pract': None }
     completeArgs = {**emptyArgs, **kwargs}
     registerNPDB(completeArgs)
 
@@ -266,7 +272,7 @@ def registerNPDB(data):
     event = validateData(Event, 'event_id', data['event_day'], data['event_outcome'], data['event_paid_by'])
     payment = validateData(Payment, 'payment_id', data['payment_date'], data['payment_total_amount'])
     action = validateData(Action, 'action_id', data['action_initial'], data['action_basis'])
-    npdb = NPDB(data['process_date'], data['practitioner_name'], action, data['entity_name'], payment, event, data['relevant'])
+    npdb = NPDB(data['process_date'], data['practitioner_name'], action, data['entity_name'], payment, event, data['report_found'], data['dcn'], data['npi'], data['amount_pract'])
     Session.add(npdb)
     Session.commit()
 
@@ -279,8 +285,8 @@ def validateData(objectClass, id_name, *args):
         Session.flush()
         return getattr(dataObject, id_name)
 
-registerRecord(timeDimDay = 5, timeDimMonth = 12, statusName = 'Test', relevant = True) 
+registerRecord(timeDimDay = 5, timeDimMonth = 12, statusName = 'Test', report_found = True) 
 npdbRecord(process_date = datetime.datetime.now(), practitioner_name = "Test practitioner", action_initial = 'Test initial action', 
     action_basis = 'Basis', entity_name = 'Entity first name', payment_date = datetime.datetime.now(), payment_total_amount = 5000, event_day = datetime.datetime.now(), 
-    event_outcome = 'test', event_paid_by = 'Company 1')
+    event_outcome = 'test', event_paid_by = 'Company 1', dcn = 'DCN Test', npi = 'NPI Test', amount_pract = 303)
     
